@@ -39,6 +39,14 @@ make deps
 make swagger
 ```
 
+5. Move mock data to existing folder name /db
+
+6. Start the database and other dependencies:
+
+```bash
+make docker-up
+```
+
 ## Running the Service
 
 ### Development Mode (with hot-reload)
@@ -48,29 +56,6 @@ make dev
 ```
 
 This will start the service with hot-reload enabled using Air. Any changes to the code will automatically restart the server.
-
-### Production Mode
-
-```bash
-make build
-./kasikorn-line
-```
-
-### Using Docker
-
-To run the service using Docker:
-
-1. Start the containers:
-
-```bash
-make docker-up
-```
-
-2. Stop the containers:
-
-```bash
-make docker-down
-```
 
 ## Available Make Commands
 
