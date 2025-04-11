@@ -1,0 +1,11 @@
+CREATE INDEX IF NOT EXISTS idx_user_greetings_user_id ON user_greetings(user_id);
+CREATE INDEX IF NOT EXISTS idx_banners_user_id ON banners(user_id);
+CREATE INDEX IF NOT EXISTS idx_accounts_user_id ON accounts(user_id);
+CREATE INDEX IF NOT EXISTS idx_account_balances_account_id ON account_balances(account_id);
+CREATE INDEX IF NOT EXISTS idx_account_details_account_id ON account_details(account_id);
+CREATE INDEX IF NOT EXISTS idx_account_flags_account_id ON account_flags(account_id);
+CREATE INDEX IF NOT EXISTS idx_debit_cards_user_id ON debit_cards(user_id);
+CREATE INDEX IF NOT EXISTS idx_debit_card_status_card_id ON debit_card_status(card_id);
+CREATE INDEX IF NOT EXISTS idx_debit_card_details_card_id ON debit_card_details(card_id);
+CREATE INDEX IF NOT EXISTS idx_debit_card_design_card_id ON debit_card_design(card_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id); 
