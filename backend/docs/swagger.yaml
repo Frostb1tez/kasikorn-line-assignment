@@ -1,0 +1,370 @@
+basePath: /api/v1
+definitions:
+  domain.Account:
+    properties:
+      account_id:
+        type: string
+      account_number:
+        type: string
+      balance:
+        type: number
+      color:
+        type: string
+      currency:
+        type: string
+      flags:
+        items:
+          $ref: '#/definitions/domain.AccountFlag'
+        type: array
+      is_main_account:
+        type: boolean
+      issuer:
+        type: string
+      progress:
+        type: integer
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  domain.AccountFlag:
+    properties:
+      created_at:
+        type: string
+      flag_type:
+        type: string
+      flag_value:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.Banner:
+    properties:
+      banner_id:
+        type: string
+      description:
+        type: string
+      image:
+        type: string
+      title:
+        type: string
+      user_id:
+        type: string
+    type: object
+  domain.DebitCard:
+    properties:
+      border_color:
+        type: string
+      card_number:
+        type: string
+      color:
+        type: string
+      id:
+        type: string
+      issuer:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: string
+    type: object
+  domain.ErrorResponse:
+    description: Error response from the API
+    properties:
+      message:
+        example: User not found
+        type: string
+      status:
+        example: 404
+        type: integer
+    type: object
+  domain.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  domain.PaginatedDebitCards:
+    properties:
+      cards:
+        items:
+          $ref: '#/definitions/domain.DebitCard'
+        type: array
+      has_more:
+        type: boolean
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_count:
+        type: integer
+    type: object
+  domain.SuccessResponse:
+    description: Success response from the API
+    properties:
+      data: {}
+      status:
+        example: 200
+        type: integer
+    type: object
+  domain.Transaction:
+    properties:
+      amount:
+        type: number
+      image:
+        type: string
+      is_bank:
+        type: boolean
+      name:
+        type: string
+      transaction_id:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  domain.TransactionResponse:
+    properties:
+      total_count:
+        type: integer
+      transactions:
+        items:
+          $ref: '#/definitions/domain.Transaction'
+        type: array
+    type: object
+  domain.User:
+    description: User information
+    properties:
+      greeting:
+        example: Hello, how are you?
+        type: string
+      name:
+        example: John Doe
+        type: string
+      user_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+    type: object
+  domain.UserAggregation:
+    properties:
+      account:
+        items:
+          $ref: '#/definitions/domain.Account'
+        type: array
+      banner:
+        $ref: '#/definitions/domain.Banner'
+      debit_card:
+        $ref: '#/definitions/domain.PaginatedDebitCards'
+      transaction:
+        $ref: '#/definitions/domain.TransactionResponse'
+      user:
+        $ref: '#/definitions/domain.User'
+    type: object
+  http.loginRequest:
+    properties:
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@kasikornline.com
+    name: API Support
+  description: API Server for Kasikorn Line Application
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Kasikorn Line API
+  version: "1.0"
+paths:
+  /accounts/me:
+    get:
+      description: Get current user's accounts and recent transactions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Account'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get current user's accounts and recent transactions
+      tags:
+      - accounts
+  /aggregate/me:
+    get:
+      description: Get user profile, accounts, debit cards, banner, and transactions
+        in a single call
+      parameters:
+      - description: 'Page number for debit cards (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of debit cards per page (default: 10)'
+        in: query
+        name: page_size
+        type: integer
+      - description: 'Limit number of transactions (default: 10)'
+        in: query
+        name: transaction_limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.UserAggregation'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all user data
+      tags:
+      - aggregation
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with user ID and get JWT token
+      parameters:
+      - description: Login Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Login user
+      tags:
+      - auth
+  /banners/me:
+    get:
+      description: Get the banner for the current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Banner'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get current user's banner
+      tags:
+      - banners
+  /debit-cards/me:
+    get:
+      description: Get all debit cards for a specific user with pagination
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 10)'
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.PaginatedDebitCards'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user's debit cards
+      tags:
+      - debit-cards
+  /transactions/me:
+    get:
+      description: Get all transactions for a specific user with optional limit
+      parameters:
+      - description: Limit number of transactions
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.TransactionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user's transactions
+      tags:
+      - transactions
+  /users/me:
+    get:
+      consumes:
+      - application/json
+      description: Get current user's details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get current user
+      tags:
+      - users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
